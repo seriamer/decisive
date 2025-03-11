@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>决断力培养助手</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <h1><i class="fas fa-bolt"></i> 决断力培养助手</h1>
+            <p class="tagline">告别犹豫，拥抱行动</p>
+        </header>
+
+        <div class="tab-container">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="dashboard">主页</button>
+                <button class="tab-btn" data-tab="new-decision">新决定</button>
+                <button class="tab-btn" data-tab="journal">反思日记</button>
+                <button class="tab-btn" data-tab="exercises">练习</button>
+                <button class="tab-btn" data-tab="exercise-journal">练习日记</button>
+                <button class="tab-btn" data-tab="emotion-station">情绪处理站</button>
+                <button class="tab-btn" data-tab="progress">进度</button>
+            </div>
+
+            <div id="dashboard" class="tab-content active">
+                <div class="welcome-message">
+                    <h2>今日状态</h2>
+                    <div class="stats-container">
+                        <div class="stat-box">
+                            <h3>决定计数</h3>
+                            <p class="stat-value" id="decision-count">0</p>
+                            <p class="stat-label">本周已做决定</p>
+                        </div>
+                        <div class="stat-box">
+                            <h3>当前连续天数</h3>
+                            <p class="stat-value" id="streak-count">0</p>
+                            <p class="stat-label">每天至少一个决定</p>
+                        </div>
+                        <div class="stat-box">
+                            <h3>进行中</h3>
+                            <p class="stat-value" id="pending-count">0</p>
+                            <p class="stat-label">等待决定的事项</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pending-decisions">
+                    <h2>等待决定的事项</h2>
+                    <div id="pending-decisions-list" class="decisions-list">
+                        <!-- Pending decisions will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="quick-action">
+                    <h2>今日激励</h2>
+                    <div class="quote-box" id="daily-quote">
+                        <p class="quote-text">行动可能带来失败，但不行动注定失败。</p>
+                    </div>
+                    <button id="new-decision-btn" class="action-btn">
+                        <i class="fas fa-plus"></i> 添加新决定
+                    </button>
+                </div>
+            </div>
+
+            <div id="new-decision" class="tab-content">
+                <h2 class="page-title"><i class="fas fa-lightbulb"></i>记录需要决定的事项</h2>
+                <form id="decision-form">
+                    <div class="form-group">
+                        <label for="decision-title">这个决定是什么？</label>
+                        <input type="text" id="decision-title" placeholder="例如：是否接受新工作邀请" required>
+                        <div class="input-hint">简单描述你需要做的决定</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>这个决定的重要程度？</label>
+                        <div class="importance-selector">
+                            <label>
+                                <input type="radio" name="importance" value="low" checked>
+                                <span class="importance-label low">
+                                    <i class="fas fa-leaf"></i>
+                                    小决定
+                                </span>
+                            </label>
+                            <label>
+                                <input type="radio" name="importance" value="medium">
+                                <span class="importance-label medium">
+                                    <i class="fas fa-star"></i>
+                                    中等决定
+                                </span>
+                            </label>
+                            <label>
+                                <input type="radio" name="importance" value="high">
+                                <span class="importance-label high">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    重大决定
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hesitation-reason">为什么犹豫？</label>
+                        <textarea id="hesitation-reason" placeholder="描述让你犹豫的原因..."></textarea>
+                        <div class="char-count">0/200</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deadline">决定期限</label>
+                        <div class="deadline-container">
+                            <input type="datetime-local" id="deadline">
+                            <button type="button" id="suggest-deadline" class="small-btn">
+                                <i class="fas fa-magic"></i>
+                                建议时间
+                            </button>
+                        </div>
+                        <div id="suggested-time" class="suggested-time">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>根据重要程度智能推荐决定期限</span>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="reset-form" class="secondary-btn">
+                            <i class="fas fa-undo"></i>
+                            重置
+                        </button>
+                        <button type="submit" class="primary-btn">
+                            <i class="fas fa-check"></i>
+                            保存决定
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="journal" class="tab-content">
+                <h2 class="page-title"><i class="fas fa-book"></i>反思日记</h2>
+
+                <div class="completed-decisions">
+                    <h3>已完成的决定</h3>
+                    <div id="completed-decisions-list" class="decisions-list">
+                        <!-- Completed decisions will be loaded here -->
+                    </div>
+                </div>
+
+                <div id="reflection-form-container" class="reflection-form hidden">
+                    <h3>记录这次决定的反思</h3>
+                    <form id="reflection-form">
+                        <input type="hidden" id="reflection-decision-id">
+                        <div class="form-group">
+                            <label>最终决定是什么？</label>
+                            <div class="choice-selector">
+                                <label>
+                                    <input type="radio" name="final-choice" value="yes" checked>
+                                    <span class="choice-label yes">做了</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="final-choice" value="no">
+                                    <span class="choice-label no">没做</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reflection-text">你的感受和学到了什么？</label>
+                            <textarea id="reflection-text" placeholder="描述决定后的感受，学到了什么..."></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" id="cancel-reflection" class="secondary-btn">取消</button>
+                            <button type="submit" class="primary-btn">保存反思</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="exercises" class="tab-content">
+                <h2 class="page-title"><i class="fas fa-dumbbell"></i>决策练习</h2>
+
+                <div class="exercise-cards">
+                    <div class="exercise-card">
+                        <div class="exercise-header">
+                            <h3>5秒法则</h3>
+                            <span class="difficulty easy">容易</span>
+                        </div>
+                        <p>当你想到应该做什么，马上数5,4,3,2,1，然后立即行动。</p>
+                        <div class="exercise-tools">
+                            <button class="start-exercise" data-exercise="five-second">开始练习</button>
+                        </div>
+                    </div>
+
+                    <div class="exercise-card">
+                        <div class="exercise-header">
+                            <h3>10/10/10规则</h3>
+                            <span class="difficulty medium">中等</span>
+                        </div>
+                        <p>思考这个决定在10分钟、10个月和10年后会如何影响你。</p>
+                        <div class="exercise-tools">
+                            <button class="start-exercise" data-exercise="ten-rule">开始练习</button>
+                        </div>
+                    </div>
+
+                    <div class="exercise-card">
+                        <div class="exercise-header">
+                            <h3>最坏情况分析</h3>
+                            <span class="difficulty medium">中等</span>
+                        </div>
+                        <p>分析最坏可能发生什么，以及你如何应对。</p>
+                        <div class="exercise-tools">
+                            <button class="start-exercise" data-exercise="worst-case">开始练习</button>
+                        </div>
+                    </div>
+
+                    <div class="exercise-card">
+                        <div class="exercise-header">
+                            <h3>每日微冒险</h3>
+                            <span class="difficulty easy">容易</span>
+                        </div>
+                        <p>每天做一件小小的、没有严重后果但让你略感不适的事。</p>
+                        <div class="exercise-tools">
+                            <button class="start-exercise" data-exercise="small-risk">开始练习</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="exercise-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-modal">&times;</span>
+                        <div id="exercise-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="exercise-journal" class="tab-content">
+                <h2 class="page-title"><i class="fas fa-journal-whills"></i>练习日记</h2>
+                <div class="exercise-journal-container">
+                    <div class="exercise-calendar">
+                        <h3>练习记录日历</h3>
+                        <div class="calendar-grid" id="exercise-calendar-grid"></div>
+                    </div>
+
+                    <div class="exercise-entries">
+                        <h3>练习记录</h3>
+                        <div id="exercise-entries-list" class="exercise-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="emotion-station" class="tab-content">
+                <h2>情绪处理站</h2>
+                <div class="emotion-container">
+                    <div class="emotion-check-in">
+                        <h3>今日心情打卡</h3>
+                        <div class="emotion-selector">
+                            <button class="emotion-btn" data-emotion="happy">
+                                <i class="fas fa-smile"></i>
+                                <span>开心</span>
+                            </button>
+                            <button class="emotion-btn" data-emotion="calm">
+                                <i class="fas fa-peace"></i>
+                                <span>平静</span>
+                            </button>
+                            <button class="emotion-btn" data-emotion="worried">
+                                <i class="fas fa-meh"></i>
+                                <span>担忧</span>
+                            </button>
+                            <button class="emotion-btn" data-emotion="stressed">
+                                <i class="fas fa-frown"></i>
+                                <span>压力</span>
+                            </button>
+                            <button class="emotion-btn" data-emotion="frustrated">
+                                <i class="fas fa-angry"></i>
+                                <span>烦躁</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="comfort-cards">
+                        <div class="comfort-card inspiration">
+                            <div class="card-header">
+                                <i class="fas fa-lightbulb"></i>
+                                <h4>每日灵感</h4>
+                            </div>
+                            <p class="inspiration-text">生活中的每个决定都是一次成长的机会，相信自己的判断力。</p>
+                        </div>
+
+                        <div class="comfort-card meditation">
+                            <div class="card-header">
+                                <i class="fas fa-spa"></i>
+                                <h4>冥想时刻</h4>
+                            </div>
+                            <div class="meditation-timer">
+                                <div class="timer-display">05:00</div>
+                                <button class="start-meditation">
+                                    <i class="fas fa-play"></i>
+                                    开始冥想
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="comfort-card gratitude">
+                            <div class="card-header">
+                                <i class="fas fa-heart"></i>
+                                <h4>写下心情</h4>
+                            </div>
+                            <div class="notes-input-area">
+                                <textarea placeholder="记录此刻的心情与感受..." class="gratitude-input"></textarea>
+                                <button class="save-gratitude">
+                                    <i class="fas fa-paper-plane"></i>
+                                    保存笔记
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="comfort-card notes-history-card">
+                            <div class="card-header">
+                                <i class="fas fa-book"></i>
+                                <h4>心情回顾</h4>
+                                <span class="card-subtitle">最近记录</span>
+                            </div>
+                            <div class="notes-list" id="notes-history-list">
+                                <!-- 历史记录将在这里显示 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="emotion-wisdom">
+                        <h3>情绪智慧</h3>
+                        <div class="wisdom-cards">
+                            <div class="wisdom-card">
+                                <i class="fas fa-feather-alt"></i>
+                                <h4>接纳当下</h4>
+                                <p>情绪不是敌人，它是内心的信号。试着以温和的态度接纳当下的感受。</p>
+                            </div>
+                            <div class="wisdom-card">
+                                <i class="fas fa-wind"></i>
+                                <h4>情绪流动</h4>
+                                <p>就像天气一样，情绪总是在变化。给自己一些时间，它终会云开雾散。</p>
+                            </div>
+                            <div class="wisdom-card">
+                                <i class="fas fa-seedling"></i>
+                                <h4>成长机会</h4>
+                                <p>每次情绪波动都是认识自己的机会，让我们在挑战中变得更加坚强。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="emotion-journal">
+                        <h3>心情轨迹</h3>
+                        <div class="emotion-chart">
+                            <div class="chart-container" id="emotion-trend-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="progress" class="tab-content">
+                <h2 class="page-title"><i class="fas fa-chart-line"></i>进度追踪</h2>
+
+                <div class="progress-summary">
+                    <div class="progress-stats">
+                        <div class="progress-stat">
+                            <span class="stat-label">总决定次数</span>
+                            <span class="stat-value" id="total-decisions">0</span>
+                        </div>
+                        <div class="progress-stat">
+                            <span class="stat-label">行动比例</span>
+                            <span class="stat-value" id="action-rate">0%</span>
+                        </div>
+                        <div class="progress-stat">
+                            <span class="stat-label">最长坚持天数</span>
+                            <span class="stat-value" id="max-streak">0</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-chart-container">
+                        <h3>最近30天决定记录</h3>
+                        <div class="activity-grid" id="activity-grid"></div>
+                    </div>
+
+                    <div class="decision-time-chart">
+                        <h3>决定时间趋势</h3>
+                        <p>你做决定所需的平均时间正在减少！</p>
+                        <div class="time-chart-placeholder" id="time-trend-chart">
+                            <div class="chart-line"></div>
+                            <div class="trend-indicator positive">
+                                <i class="fas fa-arrow-down"></i> -15%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>决断力培养助手 &copy; 2025 | <span id="current-date"></span></p>
+        </footer>
+    </div>
+
+    <!-- 通知组件 -->
+    <div id="notification" class="notification"></div>
+
+    <script src="app.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
